@@ -1,0 +1,37 @@
+[Package]
+version: 1
+depends: 
+
+[Product]
+type: localboot
+id: ica-set-exec-policy
+name: ICA-Set-Exec-Policy
+description: Set the Powershell execution policy.
+advice: This script executes the Powershell set-executionpolicy command using the parameter specified in the properties. Student computers should generally have the policy set to "Restricted". For more information see: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7
+version: 1.0
+priority: 0
+licenseRequired: False
+productClasses: 
+setupScript: setup.opsiscript
+uninstallScript: 
+updateScript: 
+alwaysScript: 
+onceScript: 
+customScript: 
+userLoginScript: 
+
+[ProductProperty]
+type: unicode
+name: executionpolicy
+multivalue: False
+editable: False
+description: The Powershell Exceution Policy value
+values: ["AllSigned", "Bypass", "Default", "RemoteSigned", "Restricted", "Undefined", "Unrestricted"]
+default: ["Restricted"]
+
+[Changelog]
+ica-set-exec-policy (1.0-1) stable; urgency=low
+
+	* initial: created by opsi-setup-detector
+
+ -- opsisetupdetector.exe <info@uib.de>  8/21/2020 10:23:07

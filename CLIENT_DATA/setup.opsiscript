@@ -1,0 +1,100 @@
+; ----------------------------------------------------------------
+; Copyright (c) uib gmbh (www.uib.de)
+; This sourcecode is owned by uib
+; and published under the Terms of the General Public License.
+; credits: http://www.opsi.org/en/credits/
+; ----------------------------------------------------------------
+
+;****************************************
+; SETUPTYPE      opsi script
+;****************************************
+; PRODUCTID      ica-set-exec-policy
+;****************************************
+; LICENSE        false     
+; PRODUCTDESC    Set the Powershell execution policy.
+
+; PRODUCTNAME    ICA-Set-Exec-Policy
+; PRODUCTSIZE    2 MB
+; PRODUCTVER     1.0
+;****************************************
+; SETUPSCRIPT    setup.opsiscript
+;****************************************
+; USE-MST        
+; INSTALLDIR     (not used)
+;****************************************
+; TIMESTAMP      8/21/2020 10:23:07
+;****************************************
+
+[Actions]
+requiredWinstVersion >= "4.11.4.3"
+ScriptErrorMessages = false
+
+DefVar $SetupType$
+DefVar $ProductId$ 
+DefVar $Setupfile$ 
+DefVar $InstallDir$
+DefVar $MinimumSpace$
+DefVar $ExitCode$
+DefVar $ErrorMsg$
+DefVar $LicenseRequired$
+DefVar $LicenseKey$
+DefVar $LicensePool$
+DefVar $MsiId$
+DefVar $NsisInstallBatch$
+DefVar $LogDir$
+DefVar $policylist$
+DefVar $PROP_ExecPropVal$
+
+Set $LogDir$ = "%opsiLogDir%"
+
+
+set $PROP_ExecPropVal$ = GetProductProperty("executionpolicy","Restricted")
+
+include_append "%ScriptPath%\check_msi_exitcode.opsiscript"
+
+; $ProductId$ is the name of the product in opsi, only lower letters, no umlauts, no white spaces, use '-' as a seperator
+Set $ProductId$       = "ica-set-exec-policy"
+Set $Setupfile$       = ""
+; the path where we find the product after the installation
+Set $InstallDir$      = "(not used)"
+Set $LicenseRequired$ = "false"
+Set $LicensePool$     = "p_" + $ProductId$
+Set $MsiId$           = ""
+Set $MinimumSpace$    = "2 MB"
+; ----------------------------------------------------------------
+; ----------------------------------------------------------------
+
+if not(HasMinimumSpace ("%SystemDrive%", $MinimumSpace$))
+   LogError "Not enough space on %SystemDrive%, " + $MinimumSpace$ + " on drive %SystemDrive% needed for " + $ProductId$
+   isFatalError "No Space"
+   ; Stop process and set installation status to failed
+else
+   comment "Show product picture"
+   ShowBitmap "%ScriptPath%\" + $ProductId$ + ".png" $ProductId$
+ 
+   Message "Installing " + $ProductId$ + " ..."
+    
+   comment "Start setup program"
+   ChangeDirectory "%SCRIPTPATH%"
+   ;----------------------------------------------
+   ; check the present setting - this will be displayed in the log file
+   set $policylist$ = shellCall('powershell.exe get-executionpolicy')
+   Sub_check_exitcode
+   
+   comment "Set the powershell execution policy"
+   shellCall('powershell.exe set-executionpolicy '+$PROP_ExecPropVal$)
+   Sub_check_exitcode
+   ; check the new setting
+   set $policylist$ = shellCall('powershell.exe get-executionpolicy')
+   Sub_check_exitcode
+   ;----------------------------------------------
+endif
+
+
+; ----------------------------------------------------------------
+; install section
+; ----------------------------------------------------------------
+
+; ----------------------------------------------------------------
+; ----------------------------------------------------------------
+
